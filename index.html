@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>星期三的抉择</title>
     <!-- WeChat / Open Graph sharing meta -->
     <meta property="og:title" content="星期三的抉择">
@@ -23,22 +23,23 @@
         }
 
         :root {
-            --bg: #0f1117;
-            --card: #1a1d28;
-            --card-hover: #232736;
-            --accent: #6c8cff;
-            --accent-warm: #ff9a6c;
-            --accent-green: #6cffa8;
-            --text: #e0e0e8;
-            --text-dim: #8888a0;
-            --text-bright: #ffffff;
-            --border: #2a2d3a;
-            --shadow: rgba(0, 0, 0, 0.4);
+            --bg: #f5f7fb;
+            --bg-soft: #eef2fb;
+            --card: #ffffff;
+            --card-hover: #f7f9ff;
+            --accent: #3f6fd8;
+            --accent-warm: #e08b4f;
+            --accent-green: #2f9f73;
+            --text: #2b3550;
+            --text-dim: #6f7894;
+            --text-bright: #1f2640;
+            --border: #dbe3f3;
+            --shadow: rgba(58, 76, 120, 0.12);
         }
 
         body {
             font-family: 'Noto Sans SC', sans-serif;
-            background: var(--bg);
+            background: radial-gradient(circle at 15% 0%, #fff8ef 0, var(--bg-soft) 35%, var(--bg) 100%);
             color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
@@ -66,6 +67,7 @@
             font-weight: 700;
             background: linear-gradient(135deg, var(--accent), var(--accent-warm));
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 12px;
         }
@@ -75,6 +77,11 @@
             font-size: 1.05em;
             margin-bottom: 40px;
             line-height: 1.8;
+        }
+
+        .subtitle-note {
+            font-size: 0.85em;
+            opacity: 0.6;
         }
 
         .start-btn {
@@ -92,7 +99,7 @@
 
         .start-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(108, 140, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(63, 111, 216, 0.26);
         }
 
         /* Scene */
@@ -197,6 +204,7 @@
             background: var(--card-hover);
             border-color: var(--accent);
             transform: translateX(4px);
+            box-shadow: 0 8px 20px var(--shadow);
         }
 
         .choice-btn .choice-label {
@@ -250,7 +258,34 @@
 
         .continue-btn:hover {
             background: var(--accent);
-            color: var(--bg);
+            color: #ffffff;
+        }
+
+        .retry-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 24px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .retry-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: #f2f6ff;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            flex-wrap: wrap;
         }
 
         /* Progress bar */
@@ -307,7 +342,12 @@
             margin-bottom: 16px;
             background: linear-gradient(135deg, var(--accent-green), var(--accent));
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+
+        .ending-replay-btn {
+            margin-top: 12px;
         }
 
         .ending-summary {
@@ -331,93 +371,50 @@
             margin-top: 0;
         }
 
-        /* Review section */
-        #review-screen {
-            display: none;
-            animation: fadeIn 1s ease;
+        .journey-list {
+            margin-top: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        #review-screen.active {
-            display: block;
-        }
-
-        #review-screen h2 {
-            font-family: 'Noto Serif SC', serif;
-            font-size: 1.8em;
-            text-align: center;
-            margin-bottom: 8px;
-            color: var(--text-bright);
-        }
-
-        #review-screen .review-subtitle {
-            text-align: center;
-            color: var(--text-dim);
-            margin-bottom: 28px;
-        }
-
-        .memo-card {
-            background: var(--card);
+        .journey-item {
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 20px 24px;
-            margin-bottom: 16px;
-            transition: all 0.3s;
-        }
-
-        .memo-card:hover {
-            border-color: var(--accent);
-        }
-
-        .memo-card .memo-tag {
-            display: inline-block;
-            padding: 3px 10px;
-            background: rgba(108, 140, 255, 0.15);
-            color: var(--accent);
-            border-radius: 6px;
-            font-size: 0.8em;
-            margin-bottom: 10px;
-            margin-right: 6px;
-        }
-
-        .memo-card .memo-scene {
-            display: inline-block;
-            padding: 3px 10px;
-            background: rgba(255, 154, 108, 0.15);
-            color: var(--accent-warm);
-            border-radius: 6px;
-            font-size: 0.8em;
-            margin-bottom: 10px;
-        }
-
-        .memo-card .memo-content {
-            font-size: 0.92em;
-            line-height: 1.8;
-            color: var(--text-dim);
-            max-height: 120px;
             overflow: hidden;
-            position: relative;
+            background: #fbfcff;
         }
 
-        .memo-card .memo-content.expanded {
-            max-height: none;
-        }
-
-        .memo-card .memo-date {
-            font-size: 0.8em;
-            color: var(--text-dim);
-            margin-top: 8px;
-            opacity: 0.6;
-        }
-
-        .expand-btn {
-            background: none;
+        .journey-toggle {
+            width: 100%;
+            padding: 16px 18px;
+            text-align: left;
             border: none;
-            color: var(--accent);
+            background: transparent;
+            color: var(--text);
             cursor: pointer;
-            font-size: 0.85em;
-            padding: 4px 0;
-            margin-top: 4px;
             font-family: inherit;
+            font-size: 0.96em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .journey-toggle:hover {
+            background: #f4f7ff;
+        }
+
+        .journey-detail {
+            display: none;
+            padding: 0 18px 16px;
+            color: var(--text-dim);
+            line-height: 1.85;
+            border-top: 1px solid var(--border);
+        }
+
+        .journey-item.open .journey-detail {
+            display: block;
         }
 
         /* Stats */
@@ -509,7 +506,7 @@
             <h1>星期三的抉择</h1>
             <div class="subtitle">
                 一个关于管理、选择与自我发现的互动故事<br>
-                <span style="font-size:0.85em; opacity:0.6;">基于你的 flomo 每日回顾 · 2026-04-22</span>
+                <span class="subtitle-note">基于年戈的 flomo 每日回顾 · 2026-04-22</span>
             </div>
             <button class="start-btn" onclick="startGame()">开始今天的故事</button>
         </div>
@@ -667,36 +664,9 @@
         <div id="ending-screen">
             <h2>一天结束了</h2>
             <div class="ending-summary" id="ending-text"></div>
-            <button class="start-btn" onclick="showReview()" style="margin-top: 12px;">
-                查看今日回顾笔记 →
+            <button class="start-btn ending-replay-btn" onclick="location.reload()">
+                重玩一次
             </button>
-        </div>
-
-        <!-- Review Screen -->
-        <div id="review-screen">
-            <h2>📝 今日 flomo 回顾</h2>
-            <p class="review-subtitle">你刚刚经历的故事，融入了以下笔记的内容</p>
-
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-num">5</div>
-                    <div class="stat-label">个场景</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-notes">6</div>
-                    <div class="stat-label">条笔记融入</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-num" id="stat-choices">0</div>
-                    <div class="stat-label">次抉择</div>
-                </div>
-            </div>
-
-            <div id="memo-list"></div>
-
-            <div style="text-align: center; margin-top: 32px; padding-bottom: 40px;">
-                <button class="start-btn" onclick="location.reload()">再玩一次</button>
-            </div>
         </div>
 
     </div>
@@ -708,43 +678,51 @@
             totalScenes: 5
         };
 
-        // Memo data from flomo review
-        const memos = [
+        const sceneRecaps = [
             {
-                scene: '场景 1：暴风前夕',
-                tags: ['Books/发现你的管理优势'],
-                content: 'e型管理者——"纵火犯"：非常享受自己带来的狂风暴雨，在分配任务时总是含糊不清，因为他压根没想清楚要做什么。抱怨下属工作效率低，也不承认是自己一直改变目标导致的效率低下。',
-                date: '2022-01-15'
+                title: '暴风前夕',
+                cognition: '新认知：管理混乱时，先把模糊信息翻译成可执行任务，而不是盲目响应。',
+                detail: {
+                    A: '你主动拆解了上级的含糊指令并确认优先级，团队执行更稳。',
+                    B: '你立即照单执行，结果因为目标变化出现返工。',
+                    C: '你选择观望避免无效劳动，但也暴露了被动应对的风险。'
+                }
             },
             {
-                scene: '场景 2：暗流涌动',
-                tags: ['memex/向上管理'],
-                content: '要引导看到实际：J在为S背锅',
-                date: '2022-11-08'
+                title: '暗流涌动',
+                cognition: '新认知：向上管理不是对抗，而是让事实进入决策链路。',
+                detail: {
+                    A: '你会后补充关键事实，既保护关系也修正了责任判断。',
+                    B: '你在会上缓冲冲突，但根因没有被完整揭示。',
+                    C: '你保持沉默，短期安全，但团队信任被悄悄消耗。'
+                }
             },
             {
-                scene: '场景 3：汪汪叫的小狗',
-                tags: ['中管常'],
-                content: '新晋管理者的误区：专心解决问题。一个个问题像汪汪叫的小狗一样吵吵嚷嚷来到时，近乎本能地冲上去。德鲁克「为成果而管理」的洞见：成果的取得靠挖掘机会，而不是解决问题。不是所有的火都需要你去灭。',
-                date: '2025-02-26'
+                title: '汪汪叫的小狗',
+                cognition: '新认知：成果来自机会配置，而不是持续救火。',
+                detail: {
+                    A: '你区分“灭火”和“开路”，把资源投向真正创造价值的事。',
+                    B: '你先处理关键紧急项并委派其余工作，团队能力被激活。',
+                    C: '你延续清单式忙碌，效率感上升但目标推进不足。'
+                }
             },
             {
-                scene: '场景 4：故事的武器',
-                tags: [],
-                content: '三层军火库——每个有影响力的领导者都需要准备好三种类型的故事：挑战故事（建立信誉）、愿景故事（激发行动）、警示故事（制造紧迫感）。',
-                date: '2025-07-31'
+                title: '故事的武器',
+                cognition: '新认知：推动改变时，要用故事建立信任、愿景和紧迫感。',
+                detail: {
+                    A: '挑战故事让团队相信“我们做得到”。',
+                    B: '愿景故事让团队看到“我们要去哪里”。',
+                    C: '警示故事让团队感到“现在必须行动”。'
+                }
             },
             {
-                scene: '场景 5：内在的声音',
-                tags: [],
-                content: '自我决定理论 (Self-Determination Theory, Deci & Ryan)——人的内在动力来自三个基本需求：自主感、胜任感、归属感。',
-                date: '2025-12-09'
-            },
-            {
-                scene: '全局背景',
-                tags: ['培训'],
-                content: '管理四种角色与管理培训相关笔记，作为故事中管理情境的整体背景参考。',
-                date: '2021-06-03'
+                title: '内在的声音',
+                cognition: '新认知：动力管理要看见自主感、胜任感和归属感。',
+                detail: {
+                    A: '你释放自主权，激活了对方的责任感和主动性。',
+                    B: '你强化胜任反馈并给出可达挑战，动力被点燃。',
+                    C: '你补足归属联结，让人从“执行者”回到“团队成员”。'
+                }
             }
         ];
 
@@ -895,9 +873,19 @@
             const result = results[scene][choice];
             const panel = document.getElementById('result-' + scene);
             panel.className = 'result-panel show ' + result.type;
-            panel.innerHTML = result.text + `<button class="continue-btn" onclick="nextScene(${scene})">继续 →</button>`;
+            panel.innerHTML = result.text +
+                `<div class="result-actions"><button class="retry-btn" onclick="retryChoice(${scene})">重选</button><button class="continue-btn" onclick="nextScene(${scene})">继续 →</button></div>`;
 
             panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function retryChoice(scene) {
+            delete gameState.choices[scene];
+            const panel = document.getElementById('result-' + scene);
+            panel.className = 'result-panel';
+            panel.innerHTML = '';
+            document.getElementById('choices-' + scene).style.display = 'flex';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function nextScene(currentScene) {
@@ -925,41 +913,34 @@
             html += '<p>没有哪个选择是完美的。但你做出了选择，并且在每一次选择中，都多理解了一点——关于管理，关于人，关于自己。</p>';
 
             html += '<h3>你的选择轨迹</h3>';
-            const sceneNames = ['暴风前夕', '暗流涌动', '汪汪叫的小狗', '故事的武器', '内在的声音'];
+            html += '<div class="journey-list">';
             for (let i = 1; i <= 5; i++) {
-                const c = gameState.choices[i];
-                html += `<p style="color: var(--text-dim);">第 ${i} 幕「${sceneNames[i - 1]}」→ 选择 ${c}</p>`;
+                const choice = gameState.choices[i] || 'A';
+                const recap = sceneRecaps[i - 1];
+                html += `<div class="journey-item" id="journey-item-${i}">
+                        <button class="journey-toggle" onclick="toggleJourney(${i})">
+                            <span>第 ${i} 幕《${recap.title}》 · 你的选择 ${choice}<br><span style="color: var(--text-dim); font-size: 0.92em;">${recap.cognition}</span></span>
+                            <span style="color: var(--accent);">展开</span>
+                        </button>
+                        <div class="journey-detail">
+                            <p>${recap.detail[choice]}</p>
+                            <p style="margin-top: 8px;"><strong>这幕给你的新认知：</strong>${recap.cognition.replace('新认知：', '')}</p>
+                        </div>
+                    </div>`;
             }
+            html += '</div>';
 
-            html += '<p style="margin-top: 16px; color: var(--accent);">每一条洞见，都来自你过去在 flomo 写下的笔记。点击下方查看原始回顾。</p>';
+            html += '<p style="margin-top: 16px; color: var(--accent);">「一天的故事」来自于年戈的 flomo 回顾。</p>';
 
             document.getElementById('ending-text').innerHTML = html;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function showReview() {
-            document.getElementById('ending-screen').classList.remove('active');
-            const review = document.getElementById('review-screen');
-            review.classList.add('active');
-
-            document.getElementById('stat-choices').textContent = Object.keys(gameState.choices).length;
-
-            let html = '';
-            memos.forEach((memo, i) => {
-                html += `
-      <div class="memo-card">
-        <div>
-          ${memo.tags.map(t => `<span class="memo-tag">#${t}</span>`).join('')}
-          <span class="memo-scene">${memo.scene}</span>
-        </div>
-        <div class="memo-content" id="memo-content-${i}">${memo.content}</div>
-        <div class="memo-date">${memo.date}</div>
-      </div>
-    `;
-            });
-
-            document.getElementById('memo-list').innerHTML = html;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function toggleJourney(idx) {
+            const el = document.getElementById('journey-item-' + idx);
+            const toggleText = el.querySelector('.journey-toggle span:last-child');
+            el.classList.toggle('open');
+            toggleText.textContent = el.classList.contains('open') ? '收起' : '展开';
         }
     </script>
 
