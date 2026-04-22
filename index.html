@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>星期三的抉择</title>
+    <!-- WeChat / Open Graph sharing meta -->
+    <meta property="og:title" content="星期三的抉择">
+    <meta property="og:description" content="一个关于管理、选择与自我发现的互动故事游戏。你是刚升职的新晋组长，今天会发生什么？">
+    <meta property="og:type" content="website">
+    <meta name="description" content="一个关于管理、选择与自我发现的互动故事游戏">
+    <!-- iOS Safari full-screen & status bar -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+SC:wght@300;400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0f1117;
+            --card: #1a1d28;
+            --card-hover: #232736;
+            --accent: #6c8cff;
+            --accent-warm: #ff9a6c;
+            --accent-green: #6cffa8;
+            --text: #e0e0e8;
+            --text-dim: #8888a0;
+            --text-bright: #ffffff;
+            --border: #2a2d3a;
+            --shadow: rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #game-container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Title Screen */
+        #title-screen {
+            text-align: center;
+            animation: fadeIn 1.5s ease;
+        }
+
+        #title-screen h1 {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 2.8em;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent-warm));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+
+        #title-screen .subtitle {
+            color: var(--text-dim);
+            font-size: 1.05em;
+            margin-bottom: 40px;
+            line-height: 1.8;
+        }
+
+        .start-btn {
+            display: inline-block;
+            padding: 14px 48px;
+            background: linear-gradient(135deg, var(--accent), #8c6cff);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 140, 255, 0.3);
+        }
+
+        /* Scene */
+        .scene {
+            display: none;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .scene.active {
+            display: block;
+        }
+
+        .scene-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .time-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.85em;
+            color: var(--accent);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .scene-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.5em;
+            color: var(--text-bright);
+        }
+
+        .narrative {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            line-height: 2;
+            font-size: 1.02em;
+        }
+
+        .narrative p {
+            margin-bottom: 16px;
+        }
+
+        .narrative p:last-child {
+            margin-bottom: 0;
+        }
+
+        .narrative .highlight {
+            color: var(--accent-warm);
+            font-weight: 600;
+        }
+
+        .narrative .dialogue {
+            color: var(--accent);
+            padding-left: 16px;
+            border-left: 2px solid var(--accent);
+            margin: 16px 0;
+            font-style: italic;
+        }
+
+        .narrative .inner-thought {
+            color: var(--text-dim);
+            font-style: italic;
+            padding-left: 16px;
+            border-left: 2px solid var(--text-dim);
+            margin: 12px 0;
+        }
+
+        /* Choices */
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .choice-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 18px 24px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-family: inherit;
+            line-height: 1.6;
+        }
+
+        .choice-btn:hover {
+            background: var(--card-hover);
+            border-color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        .choice-btn .choice-label {
+            display: inline-block;
+            color: var(--accent);
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        /* Result panel */
+        .result-panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin: 16px 0;
+            line-height: 2;
+            display: none;
+            animation: slideUp 0.5s ease;
+        }
+
+        .result-panel.show {
+            display: block;
+        }
+
+        .result-panel.good {
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .result-panel.neutral {
+            border-left: 3px solid var(--accent);
+        }
+
+        .result-panel.warn {
+            border-left: 3px solid var(--accent-warm);
+        }
+
+        .continue-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 32px;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .continue-btn:hover {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-warm));
+            transition: width 0.5s ease;
+            z-index: 100;
+        }
+
+        /* Insight card */
+        .insight-card {
+            background: linear-gradient(135deg, rgba(108, 140, 255, 0.1), rgba(255, 154, 108, 0.1));
+            border: 1px solid rgba(108, 140, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 16px 0;
+            position: relative;
+        }
+
+        .insight-card::before {
+            content: '💡';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: var(--bg);
+            padding: 0 8px;
+            font-size: 1.2em;
+        }
+
+        .insight-card .insight-text {
+            font-size: 0.95em;
+            line-height: 1.9;
+            color: var(--text);
+        }
+
+        /* Ending */
+        #ending-screen {
+            text-align: center;
+            display: none;
+            animation: fadeIn 1s ease;
+        }
+
+        #ending-screen.active {
+            display: block;
+        }
+
+        #ending-screen h2 {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 2em;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .ending-summary {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            text-align: left;
+            line-height: 2;
+            margin: 24px 0;
+        }
+
+        .ending-summary h3 {
+            font-family: 'Noto Serif SC', serif;
+            color: var(--text-bright);
+            margin: 20px 0 12px;
+            font-size: 1.15em;
+        }
+
+        .ending-summary h3:first-child {
+            margin-top: 0;
+        }
+
+        /* Review section */
+        #review-screen {
+            display: none;
+            animation: fadeIn 1s ease;
+        }
+
+        #review-screen.active {
+            display: block;
+        }
+
+        #review-screen h2 {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.8em;
+            text-align: center;
+            margin-bottom: 8px;
+            color: var(--text-bright);
+        }
+
+        #review-screen .review-subtitle {
+            text-align: center;
+            color: var(--text-dim);
+            margin-bottom: 28px;
+        }
+
+        .memo-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+
+        .memo-card:hover {
+            border-color: var(--accent);
+        }
+
+        .memo-card .memo-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            background: rgba(108, 140, 255, 0.15);
+            color: var(--accent);
+            border-radius: 6px;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+            margin-right: 6px;
+        }
+
+        .memo-card .memo-scene {
+            display: inline-block;
+            padding: 3px 10px;
+            background: rgba(255, 154, 108, 0.15);
+            color: var(--accent-warm);
+            border-radius: 6px;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+
+        .memo-card .memo-content {
+            font-size: 0.92em;
+            line-height: 1.8;
+            color: var(--text-dim);
+            max-height: 120px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .memo-card .memo-content.expanded {
+            max-height: none;
+        }
+
+        .memo-card .memo-date {
+            font-size: 0.8em;
+            color: var(--text-dim);
+            margin-top: 8px;
+            opacity: 0.6;
+        }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 0.85em;
+            padding: 4px 0;
+            margin-top: 4px;
+            font-family: inherit;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 24px 0;
+        }
+
+        .stat-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-item .stat-num {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-item .stat-label {
+            font-size: 0.8em;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .typewriter {
+            overflow: hidden;
+        }
+
+        /* Mobile */
+        @media (max-width: 600px) {
+            #game-container {
+                padding: 16px;
+            }
+
+            #title-screen h1 {
+                font-size: 2em;
+            }
+
+            .narrative {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <div id="game-container">
+
+        <!-- Title Screen -->
+        <div id="title-screen">
+            <h1>星期三的抉择</h1>
+            <div class="subtitle">
+                一个关于管理、选择与自我发现的互动故事<br>
+                <span style="font-size:0.85em; opacity:0.6;">基于你的 flomo 每日回顾 · 2026-04-22</span>
+            </div>
+            <button class="start-btn" onclick="startGame()">开始今天的故事</button>
+        </div>
+
+        <!-- Scene 1: The Arsonist Boss -->
+        <div class="scene" id="scene-1">
+            <div class="scene-header">
+                <span class="time-badge">☀️ 08:30</span>
+                <span class="scene-title">暴风前夕</span>
+            </div>
+            <div class="narrative">
+                <p>你叫林远，三个月前刚升了组长。</p>
+                <p>周三早晨，你打开电脑，屏幕上亮着 <span class="highlight">5 条未读消息</span>，全来自你的上级——陈总监。</p>
+                <p>第一条：<span class="dialogue">「那个项目，方案要调，你重新想想。」</span></p>
+                <p>第二条：<span class="dialogue">「客户那边有新情况，优先处理。」</span></p>
+                <p>第三条：<span class="dialogue">「明天要用的材料，今天搞定。」</span></p>
+                <p>没有上下文，没有具体要求，每条都像扔出来的火把。你还没回过神来，第四条消息弹出来——又是一个「紧急调整」。</p>
+                <p>你想起一本书里的描述：有一种管理者叫<span
+                        class="highlight">「纵火犯」</span>——他们享受自己带来的狂风暴雨，在分配任务时总是含糊不清，因为他压根没想清楚要做什么。他会不停地改变目标，却抱怨下属效率低。</p>
+                <p class="inner-thought">陈总监可能不是故意的…但效果上，和纵火犯没什么区别。</p>
+                <p>你的组员小陆探头过来：「远哥，陈总又发了一堆活，我手里还有三个没做完的呢，先做哪个？」</p>
+            </div>
+            <div class="choices" id="choices-1">
+                <button class="choice-btn" onclick="choose(1, 'A')">
+                    <span class="choice-label">A</span>先把陈总的消息逐条拆解，搞清楚到底要什么，再分配给团队
+                </button>
+                <button class="choice-btn" onclick="choose(1, 'B')">
+                    <span class="choice-label">B</span>全部照单全收，先干起来再说——反正陈总要的就是「立刻行动」的态度
+                </button>
+                <button class="choice-btn" onclick="choose(1, 'C')">
+                    <span class="choice-label">C</span>跟小陆说：「别急，他过两天可能又改主意了，先把手里的做完」
+                </button>
+            </div>
+            <div class="result-panel" id="result-1"></div>
+        </div>
+
+        <!-- Scene 2: The Scapegoat -->
+        <div class="scene" id="scene-2">
+            <div class="scene-header">
+                <span class="time-badge">🕙 10:00</span>
+                <span class="scene-title">暗流涌动</span>
+            </div>
+            <div class="narrative">
+                <p>周会上，陈总监正在复盘上周的项目延期。</p>
+                <p>气氛有点紧。陈总监看向你的同事小杰：<span class="dialogue">「这次交付延迟，客户那边的对接你负责的吧？」</span></p>
+                <p>你心里清楚，真正出问题的是小苏——他上周请了三天假，关键节点的数据没有按时给到小杰。小杰是在帮小苏擦屁股，结果延迟的锅却扣在了自己头上。</p>
+                <p>小杰沉默了两秒，低头说：<span class="dialogue">「嗯…是我这边协调得不够及时。」</span></p>
+                <p>小苏在旁边一声不吭。</p>
+                <p class="inner-thought">小杰在替小苏背锅。如果不说出来，这件事就这样过去了。但当众揭穿，小苏面子挂不住，小杰也可能觉得我多管闲事。</p>
+            </div>
+            <div class="choices" id="choices-2">
+                <button class="choice-btn" onclick="choose(2, 'A')">
+                    <span class="choice-label">A</span>会后私下找陈总监，把实际情况说清楚——引导他看到事实
+                </button>
+                <button class="choice-btn" onclick="choose(2, 'B')">
+                    <span class="choice-label">B</span>在会上轻描淡写地补一句：「这个节点其实涉及多方配合，不完全是小杰一个人的问题」
+                </button>
+                <button class="choice-btn" onclick="choose(2, 'C')">
+                    <span class="choice-label">C</span>不说话，这不是你的组，不该插手
+                </button>
+            </div>
+            <div class="result-panel" id="result-2"></div>
+        </div>
+
+        <!-- Scene 3: The Barking Dogs -->
+        <div class="scene" id="scene-3">
+            <div class="scene-header">
+                <span class="time-badge">🌙 12:00</span>
+                <span class="scene-title">汪汪叫的小狗</span>
+            </div>
+            <div class="narrative">
+                <p>中午，你对着待办清单发呆。</p>
+                <p><span class="highlight">15 个事项</span>，全标着红色感叹号。你从早上八点半忙到现在，划掉了 6 个，又新增了 4 个。</p>
+                <p>上午你修了一个流程 bug，回了三封催促邮件，帮小陆解决了一个数据问题，还替团队协调了一个跨部门的需求冲突。</p>
+                <p class="inner-thought">忙是真忙。可我今天到底做了什么？</p>
+                <p>你想起之前看过德鲁克的一个观点：<span class="highlight">「成果的取得靠挖掘机会，而不是解决问题。」</span></p>
+                <p>一个个问题像汪汪叫的小狗，吵吵嚷嚷地跑过来，你近乎本能地冲上去解决。但解完这个，下一只又叫了。你变成了问题流水线上的操作工。</p>
+                <p>问题是要解决的，但当你全部的精力只专注在问题单上——你就忘了去想：<span class="highlight">机会在哪里？</span></p>
+                <p>你看着那 15 条待办，开始重新思考。</p>
+            </div>
+            <div class="choices" id="choices-3">
+                <button class="choice-btn" onclick="choose(3, 'A')">
+                    <span class="choice-label">A</span>把待办分成「问题」和「机会」两栏，优先处理能创造价值的事
+                </button>
+                <button class="choice-btn" onclick="choose(3, 'B')">
+                    <span class="choice-label">B</span>先挑最紧急的三件做完，其余教团队自己解决——不是所有火都需要你去灭
+                </button>
+                <button class="choice-btn" onclick="choose(3, 'C')">
+                    <span class="choice-label">C</span>算了，先吃饭吧，回来继续清问题单，今天能划掉几个是几个
+                </button>
+            </div>
+            <div class="result-panel" id="result-3"></div>
+        </div>
+
+        <!-- Scene 4: The Arsenal of Stories -->
+        <div class="scene" id="scene-4">
+            <div class="scene-header">
+                <span class="time-badge">🌤 15:00</span>
+                <span class="scene-title">故事的武器</span>
+            </div>
+            <div class="narrative">
+                <p>下午三点，你召集团队开了个短会。</p>
+                <p>你想推动一件事：让团队改变目前「接需求—做需求—交付需求」的被动模式，开始主动研究客户痛点，提出主动方案。</p>
+                <p>但你知道，直接说「我们要转型」只会换来一屋子茫然的表情。你需要讲一个<span class="highlight">能让人信的故事</span>。</p>
+                <p>你想起一个说法：有影响力的领导者需要准备三种故事——</p>
+                <p><span class="highlight">挑战故事</span>：你们如何克服困难障碍，用来建立信誉。</p>
+                <p><span class="highlight">愿景故事</span>：如果做了正确的选择，一切会怎样，用来激发行动。</p>
+                <p><span class="highlight">警示故事</span>：如果什么都不做，后果是什么，用来制造紧迫感。</p>
+                <p>面对你的团队，你准备讲哪种故事？</p>
+            </div>
+            <div class="choices" id="choices-4">
+                <button class="choice-btn" onclick="choose(4, 'A')">
+                    <span class="choice-label">A</span>讲一个<strong>挑战故事</strong>：分享上次你主动提方案帮客户解决问题的经历——「我们其实有过成功经验」
+                </button>
+                <button class="choice-btn" onclick="choose(4, 'B')">
+                    <span class="choice-label">B</span>讲一个<strong>愿景故事</strong>：描绘一种画面——如果我们能提前理解客户的痛点，我们的工作会变得完全不同
+                </button>
+                <button class="choice-btn" onclick="choose(4, 'C')">
+                    <span class="choice-label">C</span>讲一个<strong>警示故事</strong>：如果继续被动等需求，迟早会被替代——「不变就出局」
+                </button>
+            </div>
+            <div class="result-panel" id="result-4"></div>
+        </div>
+
+        <!-- Scene 5: Self-Determination -->
+        <div class="scene" id="scene-5">
+            <div class="scene-header">
+                <span class="time-badge">🌆 18:00</span>
+                <span class="scene-title">内在的声音</span>
+            </div>
+            <div class="narrative">
+                <p>加班到六点，同事们陆续走了。小陆还没走，但状态明显不对——双手托着下巴，盯着屏幕发呆。</p>
+                <p>你过去坐下：<span class="dialogue">「今天怎么了？」</span></p>
+                <p>小陆沉默了一会儿：<span class="dialogue">「远哥，我最近觉得…挺没劲的。每天干的活好像都一样，也不知道干得好不好，好像干什么都无所谓。」</span></p>
+                <p>你想起心理学里的<span
+                        class="highlight">自我决定理论</span>——人的内在动力来自三个基本需求：<strong>自主感</strong>（我能决定做什么）、<strong>胜任感</strong>（我能做好）、<strong>归属感</strong>（我跟这个团队有联结）。
+                </p>
+                <p>小陆可能哪个需求没被满足？你觉得最关键的问题是什么？</p>
+            </div>
+            <div class="choices" id="choices-5">
+                <button class="choice-btn" onclick="choose(5, 'A')">
+                    <span class="choice-label">A</span>给他更多<strong>自主权</strong>——「下周那个新模块，你来定技术方案，我不插手」
+                </button>
+                <button class="choice-btn" onclick="choose(5, 'B')">
+                    <span class="choice-label">B</span>帮他建立<strong>胜任感</strong>——「上次那个方案写得真好，客户专门夸了」，然后给他一个稍有挑战但够得到的任务
+                </button>
+                <button class="choice-btn" onclick="choose(5, 'C')">
+                    <span class="choice-label">C</span>聊聊<strong>归属感</strong>——「走，下楼吃个饭，聊聊你最近在想什么」，让他感受到不只是一个执行工具
+                </button>
+            </div>
+            <div class="result-panel" id="result-5"></div>
+        </div>
+
+        <!-- Ending Screen -->
+        <div id="ending-screen">
+            <h2>一天结束了</h2>
+            <div class="ending-summary" id="ending-text"></div>
+            <button class="start-btn" onclick="showReview()" style="margin-top: 12px;">
+                查看今日回顾笔记 →
+            </button>
+        </div>
+
+        <!-- Review Screen -->
+        <div id="review-screen">
+            <h2>📝 今日 flomo 回顾</h2>
+            <p class="review-subtitle">你刚刚经历的故事，融入了以下笔记的内容</p>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-num">5</div>
+                    <div class="stat-label">个场景</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num" id="stat-notes">6</div>
+                    <div class="stat-label">条笔记融入</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-num" id="stat-choices">0</div>
+                    <div class="stat-label">次抉择</div>
+                </div>
+            </div>
+
+            <div id="memo-list"></div>
+
+            <div style="text-align: center; margin-top: 32px; padding-bottom: 40px;">
+                <button class="start-btn" onclick="location.reload()">再玩一次</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const gameState = {
+            currentScene: 0,
+            choices: {},
+            totalScenes: 5
+        };
+
+        // Memo data from flomo review
+        const memos = [
+            {
+                scene: '场景 1：暴风前夕',
+                tags: ['Books/发现你的管理优势'],
+                content: 'e型管理者——"纵火犯"：非常享受自己带来的狂风暴雨，在分配任务时总是含糊不清，因为他压根没想清楚要做什么。抱怨下属工作效率低，也不承认是自己一直改变目标导致的效率低下。',
+                date: '2022-01-15'
+            },
+            {
+                scene: '场景 2：暗流涌动',
+                tags: ['memex/向上管理'],
+                content: '要引导看到实际：J在为S背锅',
+                date: '2022-11-08'
+            },
+            {
+                scene: '场景 3：汪汪叫的小狗',
+                tags: ['中管常'],
+                content: '新晋管理者的误区：专心解决问题。一个个问题像汪汪叫的小狗一样吵吵嚷嚷来到时，近乎本能地冲上去。德鲁克「为成果而管理」的洞见：成果的取得靠挖掘机会，而不是解决问题。不是所有的火都需要你去灭。',
+                date: '2025-02-26'
+            },
+            {
+                scene: '场景 4：故事的武器',
+                tags: [],
+                content: '三层军火库——每个有影响力的领导者都需要准备好三种类型的故事：挑战故事（建立信誉）、愿景故事（激发行动）、警示故事（制造紧迫感）。',
+                date: '2025-07-31'
+            },
+            {
+                scene: '场景 5：内在的声音',
+                tags: [],
+                content: '自我决定理论 (Self-Determination Theory, Deci & Ryan)——人的内在动力来自三个基本需求：自主感、胜任感、归属感。',
+                date: '2025-12-09'
+            },
+            {
+                scene: '全局背景',
+                tags: ['培训'],
+                content: '管理四种角色与管理培训相关笔记，作为故事中管理情境的整体背景参考。',
+                date: '2021-06-03'
+            }
+        ];
+
+        // Result texts
+        const results = {
+            1: {
+                A: {
+                    type: 'good',
+                    text: `<p>你花了二十分钟，把陈总的五条消息翻译成了具体的行动项。有两条其实说的是同一件事，有一条仔细想想根本不紧急。</p>
+<p>你把整理好的清单发给陈总确认：「陈总，我理解的优先级是这样——1、2、3。您看对吗？」</p>
+<p>陈总回了一个「嗯」。</p>
+<div class="insight-card"><div class="insight-text">面对「纵火犯」型上级，最重要的不是跑得快，而是<strong>把模糊变成清晰</strong>。他不把细节想清楚，你就帮他想清楚——然后让他确认。这样既不对抗，也不被裹挟。</div></div>`
+                },
+                B: {
+                    type: 'warn',
+                    text: `<p>你和小陆分头冲了上去。一个小时后，陈总又发了一条消息：「那个方案不用调了，客户那边自己解决了。」</p>
+<p>小陆一脸绝望地看着你：「远哥，我那个活白干了？」</p>
+<p>你苦笑。这场景太熟悉了。</p>
+<div class="insight-card"><div class="insight-text">「纵火犯」的下属慢慢会学到：不要把他的话立刻当真。因为他分派的任务并非都真的需要完成——过不了多久他就会改变主意。盲目响应，消耗的是团队的信任和士气。</div></div>`
+                },
+                C: {
+                    type: 'neutral',
+                    text: `<p>小陆半信半疑：「真的不管吗？」</p>
+<p>「先把手里的做好。」你说。</p>
+<p>果然，到了中午，陈总的五条消息只剩两条还有效。你心里有了点底。</p>
+<div class="insight-card"><div class="insight-text">「纵火犯」的下属往往会逐渐学会：不必每一把火都去救。但这种策略有风险——如果偶尔那条消息真的重要呢？更好的方式是主动去<strong>确认优先级</strong>，而不只是被动等他改主意。</div></div>`
+                }
+            },
+            2: {
+                A: {
+                    type: 'good',
+                    text: `<p>会后你单独敲了陈总办公室的门。</p>
+<p>「陈总，刚才小杰的事，我补充一点背景——上周小苏请假那几天，数据交接出了空档。小杰其实是接手救急的。」</p>
+<p>陈总沉吟了一下：「嗯，我知道了。」</p>
+<p>你没有当面指责谁，但把<strong>事实</strong>摆到了该看到的人面前。</p>
+<div class="insight-card"><div class="insight-text">向上管理的核心不是讨好，是<strong>引导上级看到事实</strong>。不需要替任何人出头，也不需要制造对立——只需要让真实的信息到达该到的地方。</div></div>`
+                },
+                B: {
+                    type: 'neutral',
+                    text: `<p>你在会上说：「补充一下，这个节点的延迟涉及好几个环节的配合，不完全是某一个人的问题。」</p>
+<p>陈总点了点头，没再追究。小杰给你投来一个感激的眼神。小苏低着头，不知道在想什么。</p>
+<div class="insight-card"><div class="insight-text">在会上给出缓冲是一种温和的向上管理。但要注意：如果总是「替人说话」而不把根因说清楚，问题会反复出现。关键在于——<strong>要引导看到实际</strong>，而不只是帮人解围。</div></div>`
+                },
+                C: {
+                    type: 'warn',
+                    text: `<p>你选择了沉默。会议继续，小杰领了一份不属于他的责任。</p>
+<p>散会后你路过小杰工位，他已经在默默整理延期说明了。你心里有些不是滋味。</p>
+<div class="insight-card"><div class="insight-text">不插手当然是安全的。但当你看到一个人在替另一个人扛不属于他的锅，选择视而不见，团队里的信任就在无声中流失。有些事不是你的责任——但说出事实，是一种选择。</div></div>`
+                }
+            },
+            3: {
+                A: {
+                    type: 'good',
+                    text: `<p>你在白纸上画了一条线，左边写「灭火」，右边写「开路」。</p>
+<p>15 件事情，有 11 件是在灭火——修 bug、回邮件、催进度。只有 4 件跟你本月的目标有关系。而那 4 件，你一件都没碰。</p>
+<p>你把 3 件灭火任务分给了团队成员——他们其实完全能处理，只是习惯了先问你。</p>
+<p>然后你锁定了右边栏里最重要的那件事，打开了一个空白文档。</p>
+<div class="insight-card"><div class="insight-text">德鲁克说：「管理者的职责不是解决所有问题，而是创造一个能解决问题的环境。」当你发现自己每天都在救火，一边救火一边得问：<strong>为什么老是着火？</strong>——答案往往在「机会」那一栏里。</div></div>`
+                },
+                B: {
+                    type: 'neutral',
+                    text: `<p>你快速扫了一遍清单，圈出了三件真正紧急的事，然后把其余的标记成「可延后」或「可委派」。</p>
+<p>然后你走到小陆和小张的工位：「这几件你们各认领一个，不确定的随时问我，但先自己想一轮。」</p>
+<p>两个人有点惊讶——远哥今天居然不自己扛了？</p>
+<div class="insight-card"><div class="insight-text">不是所有问题都需要你解决。有些问题可以教会团队解决，有些问题的存在本身就是因为我们忽视了某个目标。当你把灭火的任务分出去，才能腾出手<strong>去做只有你能做的事</strong>。</div></div>`
+                },
+                C: {
+                    type: 'warn',
+                    text: `<p>你去楼下吃了碗面，回来继续做。</p>
+<p>下午五点，清单上划掉了 10 件。你长出一口气——挺有成就感的。</p>
+<p>但回过头一看，划掉的全是琐事。你这个月的目标，进度是零。</p>
+<p class="inner-thought">把一个个待办项划掉，确实有即时的多巴胺快感。可今天结束后，你离目标更近了吗？</p>
+<div class="insight-card"><div class="insight-text">解决问题让人有「在干活」的满足感。但如果你的全部精力都花在了清单上，你就成了试卷的解题家。<strong>你在完成指标，还是在做事？</strong></div></div>`
+                }
+            },
+            4: {
+                A: {
+                    type: 'good',
+                    text: `<p>你讲了去年的一件事：你注意到某个客户反复提同一类需求，就主动研究了他们的业务流程，提了一套整合方案。客户惊讶地说：「你们终于理解我们想要什么了。」</p>
+<p>那个月，续约谈判出奇地顺利。</p>
+<p>「这不是什么大事。但它说明，当我们主动去理解客户在想什么，事情就会不一样。」你说。</p>
+<p>团队里有人开始点头。</p>
+<div class="insight-card"><div class="insight-text"><strong>挑战故事</strong>的核心是「我们做过，我们能做到」。它建立信誉，让团队相信这不是空话。最好的挑战故事来自真实经历——你自己的，或团队的。</div></div>`
+                },
+                B: {
+                    type: 'good',
+                    text: `<p>你没有讲过去，你描绘了一种可能。</p>
+<p>「想象一下：客户还没开口，我们就已经知道他下个季度会需要什么。他来找我们不是因为我们便宜，是因为我们懂他。」</p>
+<p>「那时候，我们坐在会议室里，不是等着接需求，而是拿着我们的方案说：『你看看这个，是不是你要的？』」</p>
+<p>小陆的眼睛亮了一下。</p>
+<div class="insight-card"><div class="insight-text"><strong>愿景故事</strong>的核心是「如果我们做了正确的选择，世界可以变成什么样」。它不需要数据和逻辑，它需要<strong>一幅让人想走进去的画面</strong>。</div></div>`
+                },
+                C: {
+                    type: 'neutral',
+                    text: `<p>你拿出了一组行业数据：这一年被客户替换的供应商里，80% 的原因不是「做得不好」，而是「没有主动性」。</p>
+<p>「我们现在就是这 80% 里的一员。如果还是等着别人喂需求，迟早轮到我们。」</p>
+<p>团队沉默了几秒。气氛有点沉重，但注意力是集中的。</p>
+<div class="insight-card"><div class="insight-text"><strong>警示故事</strong>的核心是「如果什么都不做，后果是什么」。它适合制造紧迫感——但要小心，<strong>恐惧能让人醒来，但不能让人跑起来</strong>。你还需要在恐惧之后，给出方向。</div></div>`
+                }
+            },
+            5: {
+                A: {
+                    type: 'good',
+                    text: `<p>「下周那个新模块的技术方案，你来定。我不参与，你自己决定。做完了跟我说一声就行。」</p>
+<p>小陆抬起头，眼里有一丝意外，然后是一丝光亮：「真的？」</p>
+<p>「真的。你比我更了解那块的细节。」</p>
+<p>小陆收起了下巴上的手，打开了编辑器。</p>
+<div class="insight-card"><div class="insight-text"><strong>自主感</strong>——让人感到「我能决定做什么、怎么做」。当每件事都要请示、每个方案都要审批时，人会变成执行机器。有时候，管理者「不插手」本身就是最好的激励。</div></div>`
+                },
+                B: {
+                    type: 'good',
+                    text: `<p>「对了，上次你写的那个方案，客户私下跟我说了，写得特别清楚。」你停顿了一下，「这不是客套话。」</p>
+<p>小陆有点不好意思地笑了。</p>
+<p>「所以下周有个方案你来主笔，难度可能比上次大一点——但我觉得你够了。」</p>
+<div class="insight-card"><div class="insight-text"><strong>胜任感</strong>——让人感到「我能做好」。它不是来自空洞的鼓励，而是来自真实的正反馈 + 恰好够得到的挑战。先让人看到自己做到了什么，再给一个稍高的台阶。</div></div>`
+                },
+                C: {
+                    type: 'good',
+                    text: `<p>你站起来：「走，下楼吃饭去。别带电脑。」</p>
+<p>小陆有点懵，但还是跟你下了楼。</p>
+<p>吃饭的时候，你没聊工作。你聊了聊最近在玩什么游戏、周末干了什么。小陆慢慢放松下来，开始吐槽最近的加班生活，然后不知不觉聊到了对团队方向的想法。</p>
+<p>回到工位的时候，小陆的状态明显好了一截。</p>
+<div class="insight-card"><div class="insight-text"><strong>归属感</strong>——让人感到「我不只是这里的一个工具，而是一个被看到的人」。有时候，不聊工作本身就是一种管理行为。它让人想起来：我是和<strong>一群人</strong>在一起做事，不是一个人在干活。</div></div>`
+                }
+            }
+        };
+
+        function updateProgress() {
+            const pct = (gameState.currentScene / gameState.totalScenes) * 100;
+            document.getElementById('progress-bar').style.width = pct + '%';
+        }
+
+        function startGame() {
+            document.getElementById('title-screen').style.display = 'none';
+            gameState.currentScene = 1;
+            document.getElementById('scene-1').classList.add('active');
+            updateProgress();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function choose(scene, choice) {
+            gameState.choices[scene] = choice;
+
+            // Hide choices
+            document.getElementById('choices-' + scene).style.display = 'none';
+
+            // Show result
+            const result = results[scene][choice];
+            const panel = document.getElementById('result-' + scene);
+            panel.className = 'result-panel show ' + result.type;
+            panel.innerHTML = result.text + `<button class="continue-btn" onclick="nextScene(${scene})">继续 →</button>`;
+
+            panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function nextScene(currentScene) {
+            document.getElementById('scene-' + currentScene).classList.remove('active');
+
+            if (currentScene < gameState.totalScenes) {
+                gameState.currentScene = currentScene + 1;
+                document.getElementById('scene-' + gameState.currentScene).classList.add('active');
+                updateProgress();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                showEnding();
+            }
+        }
+
+        function showEnding() {
+            updateProgress();
+            document.getElementById('progress-bar').style.width = '100%';
+
+            const ending = document.getElementById('ending-screen');
+            ending.classList.add('active');
+
+            let html = '<h3>林远的一天</h3>';
+            html += '<p>这是你作为新晋管理者的普通一天：应对上级的混乱指令，目睹职场中的替罪羊现象，在问题清单中挣扎，尝试用故事去说服团队，倾听一个疲惫的同事。</p>';
+            html += '<p>没有哪个选择是完美的。但你做出了选择，并且在每一次选择中，都多理解了一点——关于管理，关于人，关于自己。</p>';
+
+            html += '<h3>你的选择轨迹</h3>';
+            const sceneNames = ['暴风前夕', '暗流涌动', '汪汪叫的小狗', '故事的武器', '内在的声音'];
+            for (let i = 1; i <= 5; i++) {
+                const c = gameState.choices[i];
+                html += `<p style="color: var(--text-dim);">第 ${i} 幕「${sceneNames[i - 1]}」→ 选择 ${c}</p>`;
+            }
+
+            html += '<p style="margin-top: 16px; color: var(--accent);">每一条洞见，都来自你过去在 flomo 写下的笔记。点击下方查看原始回顾。</p>';
+
+            document.getElementById('ending-text').innerHTML = html;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showReview() {
+            document.getElementById('ending-screen').classList.remove('active');
+            const review = document.getElementById('review-screen');
+            review.classList.add('active');
+
+            document.getElementById('stat-choices').textContent = Object.keys(gameState.choices).length;
+
+            let html = '';
+            memos.forEach((memo, i) => {
+                html += `
+      <div class="memo-card">
+        <div>
+          ${memo.tags.map(t => `<span class="memo-tag">#${t}</span>`).join('')}
+          <span class="memo-scene">${memo.scene}</span>
+        </div>
+        <div class="memo-content" id="memo-content-${i}">${memo.content}</div>
+        <div class="memo-date">${memo.date}</div>
+      </div>
+    `;
+            });
+
+            document.getElementById('memo-list').innerHTML = html;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+
+</body>
+
+</html>
